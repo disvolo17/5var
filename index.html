@@ -1,1 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Logoisum</title>
 
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body { font-family: 'Barlow', sans-serif; }
+  </style>
+</head>
+
+<body class="bg-black text-white">
+
+<!-- HERO -->
+<section class="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden">
+
+  <!-- VIDEO BACKGROUND -->
+  <video autoplay muted loop playsinline class="absolute top-0 left-0 w-full h-full object-cover">
+    <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260228_065522_522e2295-ba22-457e-8fdb-fbcd68109c73.mp4" type="video/mp4" />
+  </video>
+
+  <!-- NAVBAR -->
+  <div class="absolute top-6 w-full flex justify-center z-20">
+    <div class="bg-white text-black rounded-[16px] shadow-lg px-6 py-3 flex items-center justify-between w-[90%] max-w-6xl">
+
+      <!-- LOGO -->
+      <div class="font-bold">Logoisum</div>
+
+      <!-- MENU -->
+      <div class="hidden md:flex gap-8 text-[14px] font-medium">
+        <a href="#">About</a>
+        <a href="#">Works</a>
+        <a href="#">Services</a>
+        <a href="#">Testimonial</a>
+      </div>
+
+      <!-- CTA -->
+      <button class="bg-[#222] text-white px-5 py-2 rounded-full flex items-center gap-2">
+        Book A Free Meeting
+        <span class="w-6 h-6 rounded-full bg-white text-black flex items-center justify-center text-sm">↗</span>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="relative z-10 text-center px-6">
+
+    <h1 class="leading-tight">
+      <div class="text-3xl md:text-5xl font-semibold tracking-[-4px]">
+        Agency that makes your
+      </div>
+
+      <div class="text-[48px] md:text-[84px] italic" style="font-family: 'Instrument Serif', serif;">
+        videos & reels viral
+      </div>
+    </h1>
+
+    <p class="mt-6 text-[18px] font-medium max-w-xl mx-auto">
+      Short-form video editing for Influencers, Creators and Brands
+    </p>
+
+    <!-- SECONDARY CTA -->
+    <button class="mt-8 bg-white text-black px-6 py-3 rounded-full flex items-center gap-3 mx-auto">
+      <span>▶</span>
+      See Our Workreel
+    </button>
+
+  </div>
+
+</section>
+
+</body>
+</html>

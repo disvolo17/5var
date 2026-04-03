@@ -1,130 +1,305 @@
-Build a dark monochrome landing page called Mindloop — a newsletter/content platform. Use React + Vite + TypeScript + Tailwind CSS + shadcn/ui + Framer Motion. Fonts: Inter (sans) and Instrument Serif (serif, used for italic accent words). The entire theme is pure black (#000) background with white foreground — no colors or gradients beyond monochrome. Install hls.js and framer-motion.
-
-Design System (index.css)
-All CSS variables in HSL (no hsl() wrapper in the variable, just the values):
-
---background: 0 0% 0%
---foreground: 0 0% 100%
---card: 0 0% 5%
---card-foreground: 0 0% 100%
---primary: 0 0% 100%
---primary-foreground: 0 0% 0%
---secondary: 0 0% 12%
---secondary-foreground: 0 0% 85%
---muted: 0 0% 15%
---muted-foreground: 0 0% 65%
---accent: 170 15% 45%
---accent-foreground: 0 0% 100%
---border: 0 0% 20%
---input: 0 0% 18%
---ring: 0 0% 40%
---hero-subtitle: 210 17% 95%
-Liquid Glass Effect (global CSS class .liquid-glass)
-
-.liquid-glass {
-  background: rgba(255, 255, 255, 0.01);
-  background-blend-mode: luminosity;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  border: none;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
-  position: relative;
-  overflow: hidden;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mindloop</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#000;--fg:#fff;--card:#0d0d0d;--secondary:#1e1e1e;--muted:#262626;
+--muted-fg:#a6a6a6;--border:#333;--accent:#3a5a52;--hero-sub:#eef2f7;
 }
-.liquid-glass::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1.4px;
-  background: linear-gradient(180deg,
-    rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.15) 20%,
-    rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%,
-    rgba(255,255,255,0.15) 80%, rgba(255,255,255,0.45) 100%);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;overflow-x:hidden;line-height:1.6}
+.serif{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400}
+.liquid-glass{
+  background:rgba(255,255,255,0.03);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,0.08);
+  position:relative;overflow:hidden;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,0.08);
 }
-Animation Pattern
-All sections use a reusable fadeUp helper with staggered delays:
-
-const fadeUp = (delay: number) => ({
-  initial: { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-100px" },
-  transition: { duration: 0.6, delay, ease: "easeOut" },
+.liquid-glass::before{
+  content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;
+  background:linear-gradient(180deg,rgba(255,255,255,0.35) 0%,rgba(255,255,255,0.1) 20%,rgba(255,255,255,0) 50%,rgba(255,255,255,0.1) 80%,rgba(255,255,255,0.35) 100%);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;
+}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:20px 80px;background:linear-gradient(180deg,rgba(0,0,0,0.7) 0%,transparent 100%)}
+.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--fg)}
+.logo-icon{position:relative;width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center}
+.logo-inner{width:12px;height:12px;border-radius:50%;border:1px solid rgba(255,255,255,0.5)}
+.nav-brand{font-weight:700;font-size:18px;letter-spacing:-0.3px}
+.nav-links{display:flex;align-items:center;gap:6px}
+.nav-sep{color:rgba(255,255,255,0.2);font-size:11px}
+.nav-links a{color:var(--muted-fg);text-decoration:none;font-size:14px;padding:6px 12px;border-radius:6px;transition:color 0.2s}
+.nav-links a:hover{color:var(--fg)}
+.nav-socials{display:flex;gap:10px}
+.social-btn{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform 0.2s;background:none}
+.social-btn:hover{transform:scale(1.08)}
+.social-btn svg{width:16px;height:16px;stroke:rgba(255,255,255,0.7);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 24px;padding-top:80px;overflow:hidden}
+.hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:0.6}
+.hero-fade{position:absolute;bottom:0;left:0;right:0;height:280px;background:linear-gradient(to top,#000 0%,transparent 100%);z-index:1}
+.hero-content{position:relative;z-index:2;max-width:900px;margin:0 auto}
+.avatar-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:32px}
+.avatars{display:flex}
+.avatar{width:32px;height:32px;border-radius:50%;border:2px solid #000;margin-left:-8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--muted-fg)}
+.avatars .avatar:first-child{margin-left:0}
+.avatar-1{background:linear-gradient(135deg,#2a2a2a,#444)}
+.avatar-2{background:linear-gradient(135deg,#333,#555)}
+.avatar-3{background:linear-gradient(135deg,#1a1a1a,#3a3a3a)}
+.avatar-label{color:var(--muted-fg);font-size:13px}
+.hero h1{font-size:clamp(42px,8vw,88px);font-weight:500;line-height:1.05;letter-spacing:-2px;margin-bottom:24px}
+.hero-sub{font-size:17px;color:#eef2f7;max-width:560px;margin:0 auto 40px;line-height:1.65}
+.subscribe-form{display:flex;align-items:center;max-width:480px;margin:0 auto;border-radius:100px;padding:6px;transition:box-shadow 0.3s}
+.subscribe-form:hover{box-shadow:0 0 0 1px rgba(255,255,255,0.15)}
+.subscribe-input{flex:1;background:transparent;border:none;outline:none;color:var(--fg);font-size:14px;padding:10px 20px;font-family:'Inter',sans-serif}
+.subscribe-input::placeholder{color:var(--muted-fg)}
+.subscribe-btn{background:var(--fg);color:var(--bg);border:none;border-radius:100px;padding:12px 28px;font-size:13px;font-weight:600;letter-spacing:0.5px;cursor:pointer;white-space:nowrap;transition:transform 0.15s,opacity 0.15s;font-family:'Inter',sans-serif}
+.subscribe-btn:hover{transform:scale(1.03);opacity:0.95}
+.subscribe-btn:active{transform:scale(0.98)}
+section{text-align:center;padding:0 24px}
+.section-heading{font-size:clamp(36px,6vw,80px);font-weight:500;line-height:1.08;letter-spacing:-1.5px;margin-bottom:20px}
+.section-sub{color:var(--muted-fg);font-size:16px;max-width:600px;margin:0 auto}
+.search-section{padding-top:200px;padding-bottom:40px}
+.platform-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:48px;max-width:900px;margin:80px auto 0;padding:0 20px}
+.platform-card{display:flex;flex-direction:column;align-items:center;gap:16px}
+.platform-icon{width:80px;height:80px;border-radius:20px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:36px}
+.platform-name{font-weight:600;font-size:14px}
+.platform-desc{color:var(--muted-fg);font-size:13px;line-height:1.5}
+.bottom-tagline{color:var(--muted-fg);font-size:13px;margin-top:60px}
+.mission-section{padding:0 24px 140px}
+.mission-video-wrap{display:flex;justify-content:center;margin-bottom:64px}
+.mission-video{width:min(700px,100%);aspect-ratio:1;object-fit:cover;border-radius:16px}
+.mission-text-wrap{max-width:800px;margin:0 auto}
+.mission-p1{font-size:clamp(22px,3.5vw,44px);font-weight:500;line-height:1.35;letter-spacing:-1px;margin-bottom:40px}
+.mission-p2{font-size:clamp(18px,2.5vw,28px);font-weight:500;line-height:1.4;color:#eef2f7}
+.word{display:inline-block;opacity:0.18;transition:opacity 0.3s}
+.word.lit{opacity:1}
+.solution-section{padding:120px 24px;border-top:1px solid rgba(255,255,255,0.08)}
+.solution-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--muted-fg);margin-bottom:20px}
+.solution-video{width:100%;max-width:1000px;aspect-ratio:3/1;object-fit:cover;border-radius:16px;margin:48px auto;display:block}
+.feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;max-width:1000px;margin:0 auto;text-align:left}
+.feature-item h4{font-weight:600;font-size:14px;margin-bottom:8px}
+.feature-item p{color:var(--muted-fg);font-size:13px;line-height:1.6}
+.cta-section{position:relative;padding:120px 24px;border-top:1px solid rgba(255,255,255,0.08);overflow:hidden;text-align:center}
+.cta-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:0.35}
+.cta-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.55);z-index:1}
+.cta-content{position:relative;z-index:2}
+.cta-logo{width:48px;height:48px;border-radius:50%;border:2px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;margin:0 auto 32px}
+.cta-logo-inner{width:20px;height:20px;border-radius:50%;border:1px solid rgba(255,255,255,0.4)}
+.cta-section h2{font-size:clamp(40px,6vw,72px);font-weight:500;letter-spacing:-1.5px;margin-bottom:16px}
+.cta-sub{color:var(--muted-fg);font-size:16px;max-width:480px;margin:0 auto 40px}
+.cta-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.btn-primary{background:var(--fg);color:var(--bg);border:none;border-radius:10px;padding:16px 36px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:transform 0.15s,opacity 0.15s}
+.btn-primary:hover{opacity:0.9;transform:scale(1.02)}
+.btn-glass{border-radius:10px;padding:16px 36px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;color:var(--fg);border:none;transition:transform 0.15s}
+.btn-glass:hover{transform:scale(1.02)}
+footer{padding:48px 80px;border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between}
+footer p{color:var(--muted-fg);font-size:13px}
+.footer-links{display:flex;gap:24px}
+.footer-links a{color:var(--muted-fg);text-decoration:none;font-size:13px;transition:color 0.2s}
+.footer-links a:hover{color:var(--fg)}
+.fade-up{opacity:0;transform:translateY(24px);transition:opacity 0.7s ease,transform 0.7s ease}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+@media(max-width:768px){
+  nav{padding:16px 24px}
+  .nav-links{display:none}
+  .platform-grid{grid-template-columns:1fr;gap:32px}
+  .feature-grid{grid-template-columns:repeat(2,1fr)}
+  footer{flex-direction:column;gap:16px;padding:32px 24px}
+}
+</style>
+</head>
+<body>
+ 
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="logo-icon"><div class="logo-inner"></div></div>
+    <span class="nav-brand">Mindloop</span>
+  </a>
+  <div class="nav-links">
+    <a href="#">Home</a><span class="nav-sep">•</span>
+    <a href="#search">How It Works</a><span class="nav-sep">•</span>
+    <a href="#mission">Philosophy</a><span class="nav-sep">•</span>
+    <a href="#solution">Use Cases</a>
+  </div>
+  <div class="nav-socials">
+    <button class="social-btn liquid-glass" title="Instagram">
+      <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+    </button>
+    <button class="social-btn liquid-glass" title="LinkedIn">
+      <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+    </button>
+    <button class="social-btn liquid-glass" title="Twitter/X">
+      <svg viewBox="0 0 24 24"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+    </button>
+  </div>
+</nav>
+ 
+<section class="hero">
+  <video class="hero-video" autoplay muted loop playsinline>
+    <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260325_120549_0cd82c36-56b3-4dd9-b190-069cfc3a623f.mp4" type="video/mp4"/>
+  </video>
+  <div class="hero-fade"></div>
+  <div class="hero-content">
+    <div class="avatar-row fade-up" style="transition-delay:0.1s">
+      <div class="avatars">
+        <div class="avatar avatar-1">A</div>
+        <div class="avatar avatar-2">M</div>
+        <div class="avatar avatar-3">J</div>
+      </div>
+      <span class="avatar-label">7,000+ people already subscribed</span>
+    </div>
+    <h1 class="fade-up" style="transition-delay:0.25s">Get <span class="serif">Inspired</span> with Us</h1>
+    <p class="hero-sub fade-up" style="transition-delay:0.4s">Join our feed for meaningful updates, news around technology and a shared journey toward depth and direction.</p>
+    <div class="subscribe-form liquid-glass fade-up" style="transition-delay:0.55s">
+      <input class="subscribe-input" type="email" placeholder="Enter your email address"/>
+      <button class="subscribe-btn">SUBSCRIBE</button>
+    </div>
+  </div>
+</section>
+ 
+<section class="search-section" id="search">
+  <h2 class="section-heading fade-up">Search has <span class="serif">changed.</span><br>Have you?</h2>
+  <p class="section-sub fade-up" style="transition-delay:0.1s">The way people discover, consume, and trust content has fundamentally shifted. A new era of information requires a new kind of platform.</p>
+  <div class="platform-grid">
+    <div class="platform-card fade-up" style="transition-delay:0.1s">
+      <div class="platform-icon">🤖</div>
+      <div class="platform-name">ChatGPT</div>
+      <p class="platform-desc">Conversational AI answers are replacing traditional search results, reshaping how people find information.</p>
+    </div>
+    <div class="platform-card fade-up" style="transition-delay:0.2s">
+      <div class="platform-icon">🔍</div>
+      <div class="platform-name">Perplexity</div>
+      <p class="platform-desc">AI-powered search aggregates and synthesizes content, changing the value of original publishing.</p>
+    </div>
+    <div class="platform-card fade-up" style="transition-delay:0.3s">
+      <div class="platform-icon">✦</div>
+      <div class="platform-name">Google AI</div>
+      <p class="platform-desc">AI Overviews now answer questions directly, reducing the click-through that content creators depended on.</p>
+    </div>
+  </div>
+  <p class="bottom-tagline fade-up" style="transition-delay:0.4s">If you don't answer the questions, someone else will.</p>
+</section>
+ 
+<section class="mission-section" id="mission">
+  <div class="mission-video-wrap fade-up">
+    <video class="mission-video" autoplay muted loop playsinline>
+      <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260325_132944_a0d124bb-eaa1-4082-aa30-2310efb42b4b.mp4" type="video/mp4"/>
+    </video>
+  </div>
+  <div class="mission-text-wrap">
+    <p class="mission-p1" id="mission-p1"></p>
+    <p class="mission-p2" id="mission-p2"></p>
+  </div>
+</section>
+ 
+<section class="solution-section" id="solution">
+  <p class="solution-label fade-up">SOLUTION</p>
+  <h2 class="section-heading fade-up" style="transition-delay:0.1s">The platform for <span class="serif">meaningful</span> content</h2>
+  <video class="solution-video fade-up" style="transition-delay:0.2s" autoplay muted loop playsinline>
+    <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260325_125119_8e5ae31c-0021-4396-bc08-f7aebeb877a2.mp4" type="video/mp4"/>
+  </video>
+  <div class="feature-grid">
+    <div class="feature-item fade-up" style="transition-delay:0.1s">
+      <h4>Curated Feed</h4>
+      <p>Algorithmically refined content surfaces based on what you actually care about — without the noise.</p>
+    </div>
+    <div class="feature-item fade-up" style="transition-delay:0.2s">
+      <h4>Writer Tools</h4>
+      <p>Powerful publishing tools designed for depth-first creators who want more than a basic editor.</p>
+    </div>
+    <div class="feature-item fade-up" style="transition-delay:0.3s">
+      <h4>Community</h4>
+      <p>Readers who respond, writers who engage — every newsletter becomes a living conversation.</p>
+    </div>
+    <div class="feature-item fade-up" style="transition-delay:0.4s">
+      <h4>Distribution</h4>
+      <p>Built-in reach across web, email, and AI surfaces so your words travel further than ever before.</p>
+    </div>
+  </div>
+</section>
+ 
+<section class="cta-section">
+  <video class="cta-video" id="cta-video" autoplay muted loop playsinline>
+    <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260325_120549_0cd82c36-56b3-4dd9-b190-069cfc3a623f.mp4" type="video/mp4"/>
+  </video>
+  <div class="cta-overlay"></div>
+  <div class="cta-content">
+    <div class="cta-logo"><div class="cta-logo-inner"></div></div>
+    <h2 class="fade-up">Start Your <span class="serif">Journey</span></h2>
+    <p class="cta-sub fade-up" style="transition-delay:0.1s">Join thousands of curious minds finding depth, direction, and community in a platform built for what matters.</p>
+    <div class="cta-btns fade-up" style="transition-delay:0.2s">
+      <button class="btn-primary">Subscribe Now</button>
+      <button class="btn-glass liquid-glass">Start Writing</button>
+    </div>
+  </div>
+</section>
+ 
+<footer>
+  <p>© 2026 Mindloop. All rights reserved.</p>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Contact</a>
+  </div>
+</footer>
+ 
+<script>
+const fadeEls=document.querySelectorAll('.fade-up');
+const obs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});
+},{threshold:0.08,rootMargin:'-40px'});
+fadeEls.forEach(el=>obs.observe(el));
+document.querySelectorAll('.hero .fade-up').forEach((el,i)=>{
+  setTimeout(()=>el.classList.add('visible'),100+i*160);
 });
-
-Page Structure (top to bottom)
-1. Navbar (fixed, transparent)
-Left: Logo (concentric circles icon — outer w-7 h-7 with border-2 border-foreground/60, inner w-3 h-3 with border border-foreground/60) + "Mindloop" bold text.
-Center-left: Nav links ["Home", "How It Works", "Philosophy", "Use Cases"] separated by • dots. Links are text-muted-foreground hover:text-foreground.
-Right: 3 social icons (Instagram, Linkedin, Twitter from lucide-react) in liquid-glass circular buttons (w-10 h-10 rounded-full).
-No background — fully transparent, fixed top-0 z-50, padding px-8 md:px-28 py-4.
-
-2. Hero Section (full viewport height)
-Background: autoplaying looping muted MP4 video covering the entire section.
-Video URL: https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260325_120549_0cd82c36-56b3-4dd9-b190-069cfc3a623f.mp4
-Bottom gradient: h-64 bg-gradient-to-t from-background to-transparent for smooth fade to black.
-Content (centered, z-10, pt-28 md:pt-32):
-Avatar row: 3 overlapping circular avatars (-space-x-2, w-8 h-8 rounded-full border-2 border-background) + "7,000+ people already subscribed" in text-muted-foreground text-sm.
-Heading: text-5xl md:text-7xl lg:text-8xl font-medium tracking-[-2px] — "Get Inspired with Us" where "Inspired" is font-serif italic font-normal.
-Subtitle: text-lg in hsl(var(--hero-subtitle)) color — "Join our feed for meaningful updates, news around technology and a shared journey toward depth and direction."
-Email form: liquid-glass rounded-full p-2 max-w-lg container with email input and a white bg-foreground text-background rounded-full px-8 py-3 "SUBSCRIBE" button with whileHover scale 1.03 and whileTap scale 0.98.
-
-3. "Search has changed" Section
-Top padding pt-52 md:pt-64, bottom padding pb-6 md:pb-9.
-Heading: text-5xl md:text-7xl lg:text-8xl — "Search has changed. Have you?" with "changed." in serif italic.
-Subtitle: text-muted-foreground text-lg max-w-2xl mx-auto mb-24.
-3 platform cards (grid md:grid-cols-3 gap-12 md:gap-8 mb-20): Each card has a 200x200 icon image centered, platform name (font-semibold text-base), and description (text-muted-foreground text-sm).
-ChatGPT icon: local asset icon-chatgpt.png
-Perplexity icon: local asset icon-perplexity.png
-Google AI icon: local asset icon-google.png
-Bottom tagline: "If you don't answer the questions, someone else will." in text-muted-foreground text-sm text-center.
-
-4. Mission Section
-Padding pt-0 pb-32 md:pb-44.
-Video: Large 800x800 looping autoplaying muted video centered.
-Video URL: https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260325_132944_a0d124bb-eaa1-4082-aa30-2310efb42b4b.mp4
-Scroll-driven word-by-word reveal using useScroll and useTransform from framer-motion:
-Paragraph 1 (text-2xl md:text-4xl lg:text-5xl font-medium tracking-[-1px]): "We're building a space where curiosity meets clarity — where readers find depth, writers find reach, and every newsletter becomes a conversation worth having." Words "curiosity", "meets", "clarity" are highlighted in --foreground, rest in --hero-subtitle.
-Paragraph 2 (text-xl md:text-2xl lg:text-3xl font-medium mt-10): "A platform where content, community, and insight flow together — with less noise, less friction, and more meaning for everyone involved."
-Each word transitions opacity from 0.15 to 1 based on scroll progress.
-
-5. Solution Section
-Padding py-32 md:py-44, border-t border-border/30.
-Label: "SOLUTION" in text-xs tracking-[3px] uppercase text-muted-foreground.
-Heading: text-4xl md:text-6xl — "The platform for meaningful content" (serif italic on "meaningful").
-Video: Rounded rounded-2xl, aspect-[3/1] object-cover.
-Video URL: https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260325_125119_8e5ae31c-0021-4396-bc08-f7aebeb877a2.mp4
-4-column feature grid (md:grid-cols-4 gap-8): Curated Feed, Writer Tools, Community, Distribution — each with title (font-semibold text-base) and description (text-muted-foreground text-sm).
-
-6. CTA Section
-Padding py-32 md:py-44, border-t border-border/30, overflow-hidden.
-Background video (HLS via hls.js): absolute inset-0 object-cover z-0.
-HLS URL: https://stream.mux.com/8wrHPCX2dC3msyYU9ObwqNdm00u3ViXvOSHUMRYSEe5Q.m3u8
-Uses Hls.isSupported() check with fallback to native HLS for Safari.
-Overlay: absolute inset-0 bg-background/45 z-[1].
-Content (z-10, centered):
-Concentric circles logo icon (w-10 h-10 outer, w-5 h-5 inner).
-Heading: "Start Your Journey" (serif italic).
-Subtitle in text-muted-foreground.
-Two buttons: "Subscribe Now" (bg-foreground text-background rounded-lg px-8 py-3.5) and "Start Writing" (liquid-glass rounded-lg).
-
-7. Footer
-Simple py-12 px-8 md:px-28 footer.
-Left: "© 2026 Mindloop. All rights reserved." in text-muted-foreground text-sm.
-Right: Privacy, Terms, Contact links in text-muted-foreground text-sm hover:text-foreground.
-
-Key Dependencies
-framer-motion for all animations
-hls.js for the CTA background video streaming
-@fontsource/inter (400, 500, 600, 700)
-@fontsource/instrument-serif (400, 400-italic)
-lucide-react for icons
-tailwindcss-animate plugin
-
-Assets Needed
-3 avatar images (avatar-1.png, avatar-2.png, avatar-3.png)
-3 platform icons (icon-chatgpt.png, icon-perplexity.png, icon-google.png)
+ 
+const p1words="We're building a space where curiosity meets clarity — where readers find depth, writers find reach, and every newsletter becomes a conversation worth having.".split(' ');
+const p2words="A platform where content, community, and insight flow together — with less noise, less friction, and more meaning for everyone involved.".split(' ');
+const highlightWords=['curiosity','meets','clarity'];
+const p1El=document.getElementById('mission-p1');
+const p2El=document.getElementById('mission-p2');
+p1words.forEach(w=>{
+  const s=document.createElement('span');
+  s.className='word';
+  const clean=w.replace(/[^a-z]/gi,'');
+  s.style.color=highlightWords.includes(clean.toLowerCase())?'#fff':'#d0d8e0';
+  s.textContent=w+' ';p1El.appendChild(s);
+});
+p2words.forEach(w=>{
+  const s=document.createElement('span');
+  s.className='word';s.style.color='#d0d8e0';
+  s.textContent=w+' ';p2El.appendChild(s);
+});
+function litWords(){
+  const allWords=[...p1El.querySelectorAll('.word'),...p2El.querySelectorAll('.word')];
+  const section=document.querySelector('.mission-section');
+  const rect=section.getBoundingClientRect();
+  const progress=Math.max(0,Math.min(1,(-rect.top+window.innerHeight*0.6)/(rect.height*0.7)));
+  const litCount=Math.floor(progress*allWords.length);
+  allWords.forEach((w,i)=>{if(i<litCount)w.classList.add('lit');else w.classList.remove('lit');});
+}
+window.addEventListener('scroll',litWords,{passive:true});
+litWords();
+ 
+const ctaVideo=document.getElementById('cta-video');
+const hlsUrl='https://stream.mux.com/8wrHPCX2dC3msyYU9ObwqNdm00u3ViXvOSHUMRYSEe5Q.m3u8';
+function tryHLS(){
+  if(typeof Hls!=='undefined'&&Hls.isSupported()){
+    const hls=new Hls();hls.loadSource(hlsUrl);hls.attachMedia(ctaVideo);
+  }else if(ctaVideo.canPlayType('application/vnd.apple.mpegurl')){
+    ctaVideo.src=hlsUrl;
+  }
+}
+const hlsScript=document.createElement('script');
+hlsScript.src='https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js';
+hlsScript.onload=tryHLS;
+document.head.appendChild(hlsScript);
+</script>
+</body>
+</html>
